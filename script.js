@@ -53,12 +53,27 @@ if (matchMedia('(hover: none)').matches) {
   items.forEach(li => spy.observe(li));
 }
 
-// Pitch demo: form is not connected yet
+// Quote form: opens Gmail with the enquiry filled in; the visitor presses Send
+// ponytail: relies on the visitor having Gmail; swap to Formspree for automatic delivery
 const form = document.querySelector('.form');
 form.addEventListener('submit', e => {
-  if (!form.action.includes('FORM_ID')) return;
   e.preventDefault();
-  form.querySelector('.form-note').textContent = 'Sample site: the form goes live when the site is launched. Please call or email for now.';
+  const d = Object.fromEntries(new FormData(form));
+  if (d._gotcha) return;
+  const body = [
+    `Name: ${d.name}`,
+    d.company ? `Company: ${d.company}` : null,
+    `Mobile: ${d.phone}`,
+    `Email: ${d.email}`,
+    `Scope: ${d.scope}`,
+    d.location ? `Project location: ${d.location}` : null,
+    '', 'Project details:', d.message
+  ].filter(l => l !== null).join('\n');
+  const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(form.dataset.to) +
+    '&su=' + encodeURIComponent(`Quotation request: ${d.scope}${d.location ? ' – ' + d.location : ''}`) +
+    '&body=' + encodeURIComponent(body);
+  window.open(url, '_blank', 'noopener');
+  form.querySelector('.form-note').textContent = 'Gmail opened in a new tab with your request filled in. Press Send there to submit it.';
 });
 
 document.getElementById('yr').textContent = new Date().getFullYear();
