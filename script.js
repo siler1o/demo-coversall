@@ -53,8 +53,7 @@ if (matchMedia('(hover: none)').matches) {
   items.forEach(li => spy.observe(li));
 }
 
-// Quote form: opens Gmail with the enquiry filled in; the visitor presses Send
-// ponytail: relies on the visitor having Gmail; swap to Formspree for automatic delivery
+// Quote form: opens the device's mail app (Gmail on Android, Mail on iOS, Outlook/Gmail on PC) with the enquiry filled in
 const form = document.querySelector('.form');
 form.addEventListener('submit', e => {
   e.preventDefault();
@@ -69,11 +68,9 @@ form.addEventListener('submit', e => {
     d.location ? `Project location: ${d.location}` : null,
     '', 'Project details:', d.message
   ].filter(l => l !== null).join('\n');
-  const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(form.dataset.to) +
-    '&su=' + encodeURIComponent(`Quotation request: ${d.scope}${d.location ? ' – ' + d.location : ''}`) +
-    '&body=' + encodeURIComponent(body);
-  window.open(url, '_blank', 'noopener');
-  form.querySelector('.form-note').textContent = 'Gmail opened in a new tab with your request filled in. Press Send there to submit it.';
+  location.href = 'mailto:' + form.dataset.to
+    + '?subject=' + encodeURIComponent(`Quotation request: ${d.scope}${d.location ? ' – ' + d.location : ''}`)
+    + '&body=' + encodeURIComponent(body);
 });
 
 document.getElementById('yr').textContent = new Date().getFullYear();
